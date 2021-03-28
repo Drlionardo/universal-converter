@@ -1,3 +1,9 @@
+# Описание
+Решение тестового задани СКБ Контур на летнюю стажировку по направлению
+[Java Backend](https://kontur.ru/education/programs/intern/java) в 2021 году.  
+Автор решения **Ягупец Данила**.  
+Оригинальный [репозиторий](https://github.com/gnkoshelev/universal-converter)
+ с тестовым заданием
 # Universal Converter
 Свершилось! Мы не одни [во Вселенной](https://habr.com/ru/company/skbkontur/blog/518490/)!
 Представители огромного числа внеземных цивилизаций разом вышли на контакт!

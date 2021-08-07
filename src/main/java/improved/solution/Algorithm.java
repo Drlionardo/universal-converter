@@ -1,9 +1,11 @@
 package improved.solution;
 
+import spring.serivce.exceptions.UnableToConvertException;
+import spring.serivce.exceptions.UnknownUnitException;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
-//TODO: Add exception handling
 //TODO: Use BigDecimal to save accuracy
 public class Algorithm {
     private ArrayList<DataType> rules;
@@ -16,15 +18,14 @@ public class Algorithm {
     }
 
     public String convert(String from, String to) {
-        Expression fromEx = parseString(from);
-        Expression toEx = parseString(to);
+        Expression fromEx = readExpression(from);
+        Expression toEx = readExpression(to);
         if(fromEx.hasEqualsPowers(toEx)) {
             double ratio = fromEx.getTotalRatio() / toEx.getTotalRatio();
-            StringBuilder output = new StringBuilder();
-            return output.append("1 ").append(fromEx.getText()).append(" = ").append(ratio).append(" ").append(toEx.getText()).toString();
+            return "1 " + fromEx.getText() + " = " + ratio + " " + toEx.getText();
         }
         else {
-            return "Unable to convert, powers do not match";
+            throw new UnableToConvertException();
         }
     }
 
@@ -32,8 +33,7 @@ public class Algorithm {
         File file = new File(filePath);
         try(Scanner scan = new Scanner(file)) {
             while (scan.hasNextLine()) {
-                String currentRule = scan.nextLine();
-                String[] rule = currentRule.split(",");
+                String[] rule = scan.nextLine().split(",");
                 String from = rule[0];
                 String to = rule[1];
                 double ratio = Double.parseDouble(rule[2]);
@@ -45,31 +45,33 @@ public class Algorithm {
         }
     }
 
-    private Expression parseString(String input) {
+    private Expression readExpression(String input) {
         input = formatInput(input);
-
-        int dividerIndex = input.indexOf('/');
-        String numerator;
-        String denominator;
-        if(dividerIndex == -1) {
-            numerator = input;
-            denominator = "";
-        } else {
-            numerator = input.substring(0, dividerIndex-1);
-            denominator = input.substring(dividerIndex + 2);
-        }
-
         Expression expression = new Expression();
         expression.setText(input);
+
+        String numerator = getNumerator(input);
         for(String unit : numerator.split(" \\* ")) {
-            DataType dataType = findDataTypeWithUnit(unit);
-            expression.incrementPower(dataType);
-            expression.setTotalRatio(expression.getTotalRatio() / dataType.getRatioForUnit(unit));
+            if(!unit.isEmpty() && !unit.equals("1")) {
+                DataType dataType = findDataTypeWithUnit(unit);
+                if(dataType == null) {
+                    throw new UnknownUnitException();
+                }
+                expression.incrementPower(dataType);
+                expression.setTotalRatio(expression.getTotalRatio() / dataType.getRatioForUnit(unit));
+            }
         }
+
+        String denominator = getDenominator(input);
         for(String unit : denominator.split(" \\* ")) {
-            DataType dataType = findDataTypeWithUnit(unit);
-            expression.decrementPower(dataType);
-            expression.setTotalRatio(expression.getTotalRatio() * dataType.getRatioForUnit(unit));
+            if(!unit.isEmpty() && !unit.equals("1")) {
+                DataType dataType = findDataTypeWithUnit(unit);
+                if(dataType == null) {
+                    throw new UnknownUnitException();
+                }
+                expression.decrementPower(dataType);
+                expression.setTotalRatio(expression.getTotalRatio() * dataType.getRatioForUnit(unit));
+            }
         }
         return expression;
     }
@@ -79,6 +81,22 @@ public class Algorithm {
         input = input.replaceAll("\\*", " * ");
         input = input.replaceAll("/", " / ");
         return input;
+    }
+    private String getNumerator(String input) {
+        int dividerIndex = input.indexOf('/');
+        if(dividerIndex == -1) {
+            return input;
+        } else {
+            return input.substring(0, dividerIndex-1);
+        }
+    }
+    private String getDenominator(String input) {
+        int dividerIndex = input.indexOf('/');
+        if(dividerIndex == -1) {
+            return "";
+        } else {
+            return input.substring(dividerIndex + 2);
+        }
     }
 
     private void addNewRule(String from, String to, double ratio) {
@@ -98,6 +116,7 @@ public class Algorithm {
         }
         return null;
     }
+
     private DataType findDataTypeWithUnit(String unit) {
         for(DataType type : rules) {
             if(type.contains(unit)) {

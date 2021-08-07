@@ -3,7 +3,6 @@ package improved.solution;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Scanner;
-//TODO: User Expression powers to validate if conversion is possible
 //TODO: Add exception handling
 //TODO: Use BigDecimal to save accuracy
 public class Algorithm {
@@ -19,9 +18,14 @@ public class Algorithm {
     public String convert(String from, String to) {
         Expression fromEx = parseString(from);
         Expression toEx = parseString(to);
-        double ratio = fromEx.getTotalRatio() / toEx.getTotalRatio();
-        StringBuilder output = new StringBuilder();
-        return output.append("1 ").append(fromEx.getText()).append(" = ").append(ratio).append(" ").append(toEx.getText()).toString();
+        if(fromEx.hasEqualsPowers(toEx)) {
+            double ratio = fromEx.getTotalRatio() / toEx.getTotalRatio();
+            StringBuilder output = new StringBuilder();
+            return output.append("1 ").append(fromEx.getText()).append(" = ").append(ratio).append(" ").append(toEx.getText()).toString();
+        }
+        else {
+            return "Unable to convert, powers do not match";
+        }
     }
 
     private void readDataFromFile() {
@@ -69,7 +73,6 @@ public class Algorithm {
         }
         return expression;
     }
-
     private String formatInput(String input) {
         //Remove extra spaces and format input
         input = input.replaceAll("\\s","");
@@ -103,5 +106,4 @@ public class Algorithm {
         }
         return null;
     }
-
 }

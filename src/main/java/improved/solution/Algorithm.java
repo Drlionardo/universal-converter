@@ -27,7 +27,7 @@ public class Algorithm {
         if(fromEx.hasEqualsPowers(toEx)) {
             BigDecimal ratio = fromEx.getTotalRatio().divide(toEx.getTotalRatio(),new MathContext(15, RoundingMode.CEILING))
             .stripTrailingZeros();
-            return "1 " + fromEx.getText() + " = " + ratio + " " + toEx.getText();
+            return "1 " + fromEx.getText() + " = " + ratio.toPlainString() + " " + toEx.getText();
         }
         else {
             throw new UnableToConvertException();
@@ -55,7 +55,7 @@ public class Algorithm {
         expression.setText(input);
 
         String numerator = getNumerator(input);
-        for(String unit : numerator.split(" \\* ")) {
+        Arrays.stream(numerator.split(" \\* ")).parallel().forEach(unit -> {
             if(!unit.isEmpty() && !unit.equals("1")) {
                 DataType dataType = findDataTypeWithUnit(unit);
                 if(dataType == null) {
@@ -64,11 +64,10 @@ public class Algorithm {
                 expression.incrementPower(dataType);
                 expression.addNumeratorRatio(dataType.getRatioForUnit(unit));
             }
-        }
+        });
 
         String denominator = getDenominator(input);
-
-        for(String unit : denominator.split(" \\* ")) {
+        Arrays.stream(denominator.split(" \\* ")).parallel().forEach(unit ->{
             if(!unit.isEmpty() && !unit.equals("1")) {
                 DataType dataType = findDataTypeWithUnit(unit);
                 if(dataType == null) {
@@ -77,7 +76,7 @@ public class Algorithm {
                 expression.decrementPower(dataType);
                 expression.addDenominatorRatio(dataType.getRatioForUnit(unit));
             }
-        }
+        });
         return expression;
     }
     private String formatInput(String input) {

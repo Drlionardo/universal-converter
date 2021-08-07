@@ -4,9 +4,13 @@ import spring.serivce.exceptions.UnableToConvertException;
 import spring.serivce.exceptions.UnknownUnitException;
 
 import java.io.File;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
-//TODO: Use BigDecimal to save accuracy
+
 public class Algorithm {
     private ArrayList<DataType> rules;
     private String filePath;
@@ -21,7 +25,8 @@ public class Algorithm {
         Expression fromEx = readExpression(from);
         Expression toEx = readExpression(to);
         if(fromEx.hasEqualsPowers(toEx)) {
-            double ratio = fromEx.getTotalRatio() / toEx.getTotalRatio();
+            BigDecimal ratio = fromEx.getTotalRatio().divide(toEx.getTotalRatio(),new MathContext(15, RoundingMode.CEILING))
+            .stripTrailingZeros();
             return "1 " + fromEx.getText() + " = " + ratio + " " + toEx.getText();
         }
         else {
@@ -37,7 +42,6 @@ public class Algorithm {
                 String from = rule[0];
                 String to = rule[1];
                 double ratio = Double.parseDouble(rule[2]);
-
                 addNewRule(from, to, ratio);
             }
         } catch (Exception e){
@@ -58,11 +62,12 @@ public class Algorithm {
                     throw new UnknownUnitException();
                 }
                 expression.incrementPower(dataType);
-                expression.setTotalRatio(expression.getTotalRatio() / dataType.getRatioForUnit(unit));
+                expression.addNumeratorRatio(dataType.getRatioForUnit(unit));
             }
         }
 
         String denominator = getDenominator(input);
+
         for(String unit : denominator.split(" \\* ")) {
             if(!unit.isEmpty() && !unit.equals("1")) {
                 DataType dataType = findDataTypeWithUnit(unit);
@@ -70,7 +75,7 @@ public class Algorithm {
                     throw new UnknownUnitException();
                 }
                 expression.decrementPower(dataType);
-                expression.setTotalRatio(expression.getTotalRatio() * dataType.getRatioForUnit(unit));
+                expression.addDenominatorRatio(dataType.getRatioForUnit(unit));
             }
         }
         return expression;

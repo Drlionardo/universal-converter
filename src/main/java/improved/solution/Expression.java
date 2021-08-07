@@ -1,17 +1,21 @@
 package improved.solution;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 class Expression {
     private String text;
     private HashMap<DataType, AtomicInteger> powers;
-    private double totalRatio;
+    private BigDecimal totalRatio;
 
     public Expression() {
         powers = new HashMap<>();
-        totalRatio = 1;
+        totalRatio = BigDecimal.ONE;
     }
 
     public String getText() {
@@ -22,23 +26,15 @@ class Expression {
         this.text = text;
     }
 
-    public HashMap<DataType, AtomicInteger> getPowers() {
-        return powers;
-    }
-
-    public void setPowers(HashMap<DataType, AtomicInteger> powers) {
-        this.powers = powers;
-    }
-
-    public double getTotalRatio() {
+    public BigDecimal getTotalRatio() {
         return totalRatio;
     }
 
-    public void setTotalRatio(double totalRatio) {
+    public void setTotalRatio(BigDecimal totalRatio) {
         this.totalRatio = totalRatio;
     }
 
-    public void incrementPower(DataType dataType) {
+    public synchronized void incrementPower(DataType dataType) {
         powers.putIfAbsent(dataType, new AtomicInteger(0));
         int power = powers.get(dataType).incrementAndGet();
         if(power == 0) {
@@ -46,7 +42,7 @@ class Expression {
         }
     }
 
-    public void decrementPower(DataType dataType) {
+    public synchronized void decrementPower(DataType dataType) {
         powers.putIfAbsent(dataType, new AtomicInteger(0));
         int power = powers.get(dataType).decrementAndGet();
         if(power == 0) {
@@ -78,5 +74,13 @@ class Expression {
             return false;
         }
         return true;
+    }
+
+    public synchronized void addNumeratorRatio(double ratioForUnit) {
+        this.totalRatio = this.totalRatio.divide(BigDecimal.valueOf(ratioForUnit), new MathContext(15, RoundingMode.CEILING));
+    }
+
+    public synchronized void addDenominatorRatio(double ratioForUnit) {
+        this.totalRatio = this.totalRatio.multiply(BigDecimal.valueOf(ratioForUnit), new MathContext(15, RoundingMode.CEILING));
     }
 }

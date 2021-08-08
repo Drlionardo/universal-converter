@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Scanner;
 
 public class Algorithm {
+    private static final MathContext MATH_CONTEXT = new MathContext(15, RoundingMode.HALF_UP);
     private ArrayList<DataType> rules;
     private String filePath;
 
@@ -22,14 +23,21 @@ public class Algorithm {
     }
 
     public String convert(String from, String to) {
+        BigDecimal ratio = getConvertRatio(from, to);
+        String fromText = formatInput(from).isEmpty() ? "" : formatInput(from);
+        String toText = formatInput(to).isEmpty() ? "" : formatInput(to);
+        //Check if string has coefficient in prefix {}
+
+        return ("1 " + fromText + " = " + ratio.toPlainString() + " " + toText).replaceAll("\\s\\s"," ").trim();
+    }
+
+    public BigDecimal getConvertRatio(String from, String to) {
         Expression fromEx = readExpression(from);
         Expression toEx = readExpression(to);
         if(fromEx.hasEqualsPowers(toEx)) {
-            BigDecimal ratio = fromEx.getTotalRatio().divide(toEx.getTotalRatio(), new MathContext(15, RoundingMode.HALF_UP))
-            .stripTrailingZeros();
-            return "1 " + fromEx.getText() + " = " + ratio.toPlainString() + " " + toEx.getText();
-        }
-        else {
+            return fromEx.getTotalRatio().divide(toEx.getTotalRatio(), MATH_CONTEXT)
+                    .stripTrailingZeros();
+        } else {
             throw new UnableToConvertException();
         }
     }
@@ -41,7 +49,7 @@ public class Algorithm {
                 String[] rule = scan.nextLine().split(",");
                 String from = rule[0];
                 String to = rule[1];
-                double ratio = Double.parseDouble(rule[2]);
+                BigDecimal ratio = new BigDecimal(rule[2]);
                 addNewRule(from, to, ratio);
             }
         } catch (Exception e){
@@ -51,7 +59,7 @@ public class Algorithm {
 
     private Expression readExpression(String input) {
         input = formatInput(input);
-        Expression expression = new Expression();
+        Expression expression = new Expression(MATH_CONTEXT);
         expression.setText(input);
 
         String numerator = getNumerator(input);
@@ -103,10 +111,10 @@ public class Algorithm {
         }
     }
 
-    private void addNewRule(String from, String to, double ratio) {
+    private void addNewRule(String from, String to, BigDecimal ratio) {
         DataType dataType = findDataTypeWithUnit(from, to);
         if(dataType == null) {
-            dataType = new DataType();
+            dataType = new DataType(MATH_CONTEXT);
             rules.add(dataType);
         }
         dataType.addRule(from, to, ratio);

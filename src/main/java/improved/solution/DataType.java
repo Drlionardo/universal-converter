@@ -1,12 +1,16 @@
 package improved.solution;
 
+import java.math.BigDecimal;
+import java.math.MathContext;
 import java.util.HashMap;
 
 class DataType {
+    private final MathContext mathContext;
     private String mainKey; //Can be removed later, for debug info only
-    private HashMap<String, Double> data;
+    private HashMap<String, BigDecimal> data;
 
-    public DataType() {
+    public DataType(MathContext mathContext) {
+        this.mathContext = mathContext;
         this.data = new HashMap<>();
     }
 
@@ -14,20 +18,20 @@ class DataType {
         return data.containsKey(unit);
     }
 
-    public double getRatioForUnit(String unit) {
+    public BigDecimal getRatioForUnit(String unit) {
         return data.get(unit);
     }
 
-    public void addRule(String from, String to, double ratio) {
+    public void addRule(String from, String to, BigDecimal ratio) {
         if (data.isEmpty()) {
             mainKey = from;
-            data.put(from, 1.0);
+            data.put(from, BigDecimal.ONE);
             data.put(to, ratio);
         } else {
             if (data.containsKey(from)) {
-                data.put(to, data.get(from) * ratio);
+                data.put(to, data.get(from).multiply(ratio));
             } else if (data.containsKey(to)) {
-                data.put(from, data.get(to) / ratio);
+                data.put(from, data.get(to).divide(ratio, mathContext));
             } else {
                 System.out.println("ERROR, CANT ADD RULE TO DATATYPE");
             }

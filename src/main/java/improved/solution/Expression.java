@@ -9,13 +9,15 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 class Expression {
+    private final MathContext mathContext;
     private String text;
     private HashMap<DataType, AtomicInteger> powers;
     private BigDecimal totalRatio;
 
-    public Expression() {
-        powers = new HashMap<>();
-        totalRatio = BigDecimal.ONE;
+    public Expression(MathContext mathContext) {
+        this.mathContext = mathContext;
+        this.powers = new HashMap<>();
+        this.totalRatio = BigDecimal.ONE;
     }
 
     public String getText() {
@@ -76,11 +78,11 @@ class Expression {
         return true;
     }
 
-    public synchronized void addNumeratorRatio(double ratioForUnit) {
-        this.totalRatio = this.totalRatio.divide(BigDecimal.valueOf(ratioForUnit), new MathContext(15, RoundingMode.HALF_UP));
+    public synchronized void addNumeratorRatio(BigDecimal ratioForUnit) {
+        this.totalRatio = this.totalRatio.divide(ratioForUnit, mathContext);
     }
 
-    public synchronized void addDenominatorRatio(double ratioForUnit) {
-        this.totalRatio = this.totalRatio.multiply(BigDecimal.valueOf(ratioForUnit), new MathContext(15, RoundingMode.HALF_UP));
+    public synchronized void addDenominatorRatio(BigDecimal ratioForUnit) {
+        this.totalRatio = this.totalRatio.multiply(ratioForUnit, mathContext);
     }
 }

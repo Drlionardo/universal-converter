@@ -37,10 +37,8 @@ public class ConverterService {
 
     public String convert(String from, String to) {
         BigDecimal ratio = getConvertRatio(from, to);
-        String fromText = formatInput(from).isEmpty() ? "" : formatInput(from);
-        String toText = formatInput(to).isEmpty() ? "" : formatInput(to);
-        //Check if string has coefficient in prefix {}
-
+        String fromText = formatExpression(formatInput(from));
+        String toText = formatExpression(formatInput(to));
         return ("1 " + fromText + " = " + ratio.toPlainString() + " " + toText).replaceAll("\\s\\s"," ").trim();
     }
 
@@ -73,7 +71,6 @@ public class ConverterService {
     private Expression readExpression(String input) {
         input = formatInput(input);
         Expression expression = new Expression(MATH_CONTEXT);
-        expression.setText(input);
 
         String numerator = getNumerator(input);
         Arrays.stream(numerator.split(" \\* ")).parallel().forEach(unit -> {
@@ -100,6 +97,16 @@ public class ConverterService {
         });
         return expression;
     }
+
+    private String formatExpression(String text) {
+        if(text.isEmpty() || text.equals("1")) {
+            return "";
+        }
+        else {
+            return text;
+        }
+    }
+
     private String formatInput(String input) {
         //Remove extra spaces and format input
         input = input.replaceAll("\\s","");
@@ -107,6 +114,7 @@ public class ConverterService {
         input = input.replaceAll("/", " / ");
         return input;
     }
+
     private String getNumerator(String input) {
         int dividerIndex = input.indexOf('/');
         if(dividerIndex == -1) {
@@ -115,6 +123,7 @@ public class ConverterService {
             return input.substring(0, dividerIndex-1);
         }
     }
+
     private String getDenominator(String input) {
         int dividerIndex = input.indexOf('/');
         if(dividerIndex == -1) {

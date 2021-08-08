@@ -77,10 +77,10 @@ class Expression {
     }
 
     public synchronized void addNumeratorRatio(double ratioForUnit) {
-        this.totalRatio = this.totalRatio.divide(BigDecimal.valueOf(ratioForUnit), new MathContext(15, RoundingMode.CEILING));
+        this.totalRatio = this.totalRatio.divide(BigDecimal.valueOf(ratioForUnit), new MathContext(15, RoundingMode.HALF_UP));
     }
 
     public synchronized void addDenominatorRatio(double ratioForUnit) {
-        this.totalRatio = this.totalRatio.multiply(BigDecimal.valueOf(ratioForUnit), new MathContext(15, RoundingMode.CEILING));
+        this.totalRatio = this.totalRatio.multiply(BigDecimal.valueOf(ratioForUnit), new MathContext(15, RoundingMode.HALF_UP));
     }
 }

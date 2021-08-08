@@ -25,7 +25,7 @@ public class Algorithm {
         Expression fromEx = readExpression(from);
         Expression toEx = readExpression(to);
         if(fromEx.hasEqualsPowers(toEx)) {
-            BigDecimal ratio = fromEx.getTotalRatio().divide(toEx.getTotalRatio(),new MathContext(15, RoundingMode.CEILING))
+            BigDecimal ratio = fromEx.getTotalRatio().divide(toEx.getTotalRatio(), new MathContext(15, RoundingMode.HALF_UP))
             .stripTrailingZeros();
             return "1 " + fromEx.getText() + " = " + ratio.toPlainString() + " " + toEx.getText();
         }

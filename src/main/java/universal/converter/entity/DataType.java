@@ -1,10 +1,10 @@
-package improved.solution;
+package universal.converter.entity;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.util.HashMap;
 
-class DataType {
+public class DataType {
     private final MathContext mathContext;
     private String mainKey; //Can be removed later, for debug info only
     private HashMap<String, BigDecimal> data;
@@ -33,6 +33,7 @@ class DataType {
             } else if (data.containsKey(to)) {
                 data.put(from, data.get(to).divide(ratio, mathContext));
             } else {
+                //TODO: add proper exception message
                 System.out.println("ERROR, CANT ADD RULE TO DATATYPE");
             }
         }

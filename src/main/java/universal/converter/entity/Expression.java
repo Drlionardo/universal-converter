@@ -1,14 +1,12 @@
-package improved.solution;
+package universal.converter.entity;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-import java.math.RoundingMode;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 
-class Expression {
+public class Expression {
     private final MathContext mathContext;
     private String text;
     private HashMap<DataType, AtomicInteger> powers;

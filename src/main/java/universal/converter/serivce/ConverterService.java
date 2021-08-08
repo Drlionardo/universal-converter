@@ -1,7 +1,12 @@
-package improved.solution;
+package universal.converter.serivce;
 
-import spring.serivce.exceptions.UnableToConvertException;
-import spring.serivce.exceptions.UnknownUnitException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.stereotype.Service;
+import universal.converter.entity.DataType;
+import universal.converter.entity.Expression;
+import universal.converter.exceptions.UnableToConvertException;
+import universal.converter.exceptions.UnknownUnitException;
 
 import java.io.File;
 import java.math.BigDecimal;
@@ -11,14 +16,22 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Scanner;
 
-public class Algorithm {
+@Service
+public class ConverterService {
     private static final MathContext MATH_CONTEXT = new MathContext(15, RoundingMode.HALF_UP);
     private ArrayList<DataType> rules;
     private String filePath;
 
-    public Algorithm(String filePath) {
-        rules = new ArrayList<>();
+    @Autowired
+    public ConverterService(ApplicationArguments applicationArguments) {
+        this.filePath = applicationArguments.getSourceArgs()[0];
+        this.rules = new ArrayList<>();
+        readDataFromFile();
+    }
+
+    public ConverterService(String filePath) {
         this.filePath = filePath;
+        this.rules = new ArrayList<>();
         readDataFromFile();
     }
 

@@ -1,4 +1,4 @@
-package spring.dto;
+package universal.converter.dto;
 
 public class InputDTO {
     private final String from;

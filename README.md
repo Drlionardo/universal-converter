@@ -1,140 +1,151 @@
-# Описание
-Решение тестового задани СКБ Контур на летнюю стажировку по направлению
-[Java Backend](https://kontur.ru/education/programs/intern/java) в 2021 году.  
-Автор решения **Ягупец Данила**.  
-Оригинальный [репозиторий](https://github.com/gnkoshelev/universal-converter)
- с тестовым заданием
+# Description
+
+Solution to the SKB Kontur internship test assignment for the [Java Backend](https://kontur.ru/education/programs/intern/java) summer program in 2021.  
+Author of the solution: **Danila Iagupets**.  
+Original [repository](https://github.com/gnkoshelev/universal-converter) with the test assignment.
+
 # Universal Converter
-Свершилось! Мы не одни [во Вселенной](https://habr.com/ru/company/skbkontur/blog/518490/)!
-Представители огромного числа внеземных цивилизаций разом вышли на контакт!
-Нас интересует, как далеко они продвинулись в точных науках.
-Однако, обменявшись базами научных статей и энциклопедий, мы столкнулись с проблемой,
-что используется невообразимо большое количество систем единиц измерений даже в пределах одной цивилизации!
 
-Теперь нам предстоит понять, сколько Бетельгейзских мйюдов в одном Земном метре
-или сколько Земных литров вмещает один РасАльгетский йидом.
+It has happened! We are not alone in the [Universe](https://habr.com/ru/company/skbkontur/blog/518490/)!  
+Representatives of countless extraterrestrial civilizations have simultaneously made contact!  
+We are interested in how far they have advanced in the exact sciences.  
+However, after exchanging databases of scientific articles and encyclopedias, we encountered a problem —  
+an unimaginably large number of unit systems is used, even within a single civilization!
 
-Предлагается помочь нашим друзьям-учёным и написать HTTP-сервис конвертации для всех единиц измерения.
+Now we need to understand how many Betelgeusian mjyuds are in one Earth meter  
+or how many Earth liters fit into one RasAlgethian yidom.
 
-## Правила конвертации
-Учёные смогли частично составить правила конвертации между инопланетными единицами измерений
-и предоставили его нам в формате [CSV](https://en.wikipedia.org/wiki/Comma-separated_values):
+We are invited to help our fellow scientists by writing an HTTP service for converting all units of measurement.
+
+## Conversion Rules
+
+Scientists have partially compiled conversion rules between alien units of measurement  
+and provided them in [CSV](https://en.wikipedia.org/wiki/Comma-separated_values) format:
 ```csv
 S,T,value
 ```
-Здесь, `S` и `T` — единицы измерения, а `value` соответствует количеству `T` в одном `S`.
+Here, `S` and `T` are units of measurement, and `value` corresponds to how many `T` are in one `S`.
 
-Пример файла:
+Example file:
 ```csv
-м,см,100
-мм,м,0.001
-км,м,1000
-час,мин,60
-мин,с,60
+m,cm,100
+mm,m,0.001
+km,m,1000
+hour,min,60
+min,s,60
 ```
-В данном примере заданы 5 правил преобразования:
-- `1 м = 100 см`
-- `1 мм = 0.001 м`
-- `1 км = 1000 м`
-- `1 час = 60 мин`
-- `1 мин = 60 с`
 
-Путь до файла должен передаваться через аргументы при запуске HTTP-сервиса.
+This example defines 5 conversion rules:
+- `1 m = 100 cm`
+- `1 mm = 0.001 m`
+- `1 km = 1000 m`
+- `1 hour = 60 min`
+- `1 min = 60 s`
 
-## Выражения для преобразования
-Выражения записываются с использованием заданных в файле обозначений для единиц измерений,
-используя только знаки умножения `*` и деления `/`.
-При этом знак деления может использоваться не более одного раза и служит для записи обыкновенной дроби.
+The path to the file must be passed as an argument when starting the HTTP service.
 
-**Примечание.** Пробельные символы не учитываются.
+## Expressions for Conversion
 
-Пример "безразмерная величина":
+Expressions are written using the unit abbreviations from the file,  
+using only multiplication `*` and division `/` operators.  
+The division symbol can be used no more than once and serves to write a fraction.
+
+**Note:** Whitespace characters are ignored.
+
+Example of a "dimensionless quantity":
 ```text
-(пустая строка)
+(empty string)
 ```
 
-Пример "метр":
+Example of a "meter":
 ```text
-м
+m
 ```
 
-Пример "герц":
+Example of a "hertz":
 ```text
-1 / с
+1 / s
 ```
 
-Пример "метр в секунду":
+Example of "meter per second":
 ```text
-м / с
+m / s
 ```
 
-Пример "ньютон"
+Example of a "newton":
 ```text
-кг * м / с * с
+kg * m / s * s
 ```
-Здесь `кг * м` - числитель, а `c * c` - знаменатель.
+
+Here `kg * m` is the numerator, and `s * s` is the denominator.
 
 ## API
-Сервис должен предоставлять один метод `POST /convert` с JSON в теле запроса: 
+
+The service must provide one method `POST /convert` with a JSON body:
 ```json
 {
- "from": "<выражение в исходных единицах измерения>",
- "to": "<выражение в единицах измерения, которые необходимо получить>"
+ "from": "<expression in source units>",
+ "to": "<expression in target units>"
 }
 ```
 
-Возможные варианты ответа:
-- Код `400 Bad Request`, если в выражениях используются неизвестные единицы измерения
-(т.е. отсутствуют в предоставленном файле с правилами конвертации).
-- Код `404 Not Found`, если невозможно осуществить такое преобразование
-(например, нельзя перевести метры в килограммы).
-- Код `200 OK`, если преобразование возможно,
-а в теле ответа передать коэффициент преобразования в виде десятичной дроби с **15 значащими цифрами**.
+Possible responses:
+- Code `400 Bad Request` if the expressions contain unknown units  
+  (i.e., not present in the provided conversion rules file).
+- Code `404 Not Found` if the conversion is not possible  
+  (e.g., converting meters to kilograms).
+- Code `200 OK` if the conversion is possible.  
+  The response body must contain the conversion factor as a decimal with **15 significant digits**.
 
-Пример тела запроса:
+Example request body:
 ```json
 {
- "from": "м / с",
- "to":  "км / час"
+ "from": "m / s",
+ "to":  "km / hour"
 }
 ```
-И соответствующее тело ответа (предполагается, что CSV-файл взят из примера выше):
+
+And the corresponding response body (assuming the CSV file from the earlier example):
 ```text
 3.6
 ```
-Таким образом, сервис подтвердит возможность преобразования по следующей формуле:
+
+Thus, the service confirms the conversion according to the formula:
 ```text
-1 м / с = 3.6 км / час
+1 m / s = 3.6 km / hour
 ```
 
-## Примеры преобразований
-В приведённых примерах используется следующий файл преобразований:
+## Conversion Examples
+
+The following examples use this conversion file:
 ```csv
-м,см,100
-мм,м,0.001
-км,м,1000
-час,мин,60
-мин,с,60
+m,cm,100
+mm,m,0.001
+km,m,1000
+hour,min,60
+min,s,60
 ```
 
-Сервис должен успешно осуществлять преобразования, соответствующие формулам:
+The service must successfully perform conversions such as:
 ```text
-1 м = 3.6 км * с / час
+1 m = 3.6 km * s / hour
 ```
 ```text
-1 км / м = 1000
+1 km / m = 1000
 ```
 
-## Требования к оформлению решения
-- Компиляция кода и его исполнение c использованием Java 11.
-- Сборка сервиса при помощи Apache Maven командой `mvn package`.
-- Сервис должен собираться в fat jar, т.е. все зависимости должны быть упакованы внутрь одного jar.
-- Запуск сервиса осуществляется командой `java -jar universal-converter-1.0.0.jar /path/to/file.csv`,
-где `/path/to/file.csv` – путь до файла с правилами конвертации.
-- Сервис должен принимать HTTP-запросы на стандартном порту (`80`).
-- Исходный код соответствует [Java Code Conventions](https://www.oracle.com/technetwork/java/codeconventions-150003.pdf)
-и [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
+## Requirements for Implementation
 
-## Информация по тестированию
-В файле с правилами конвертаций будет не более `1 000 000` различных правил конвертации,
-а уникальных единиц измерения не более `200 000`.
+- Code must compile and run with Java 11.
+- Build the service using Apache Maven with the command `mvn package`.
+- The service should be packaged as a fat JAR — all dependencies included in a single JAR file.
+- The service is launched with the command `java -jar universal-converter-1.0.0.jar /path/to/file.csv`,  
+  where `/path/to/file.csv` is the path to the file with conversion rules.
+- The service must accept HTTP requests on the standard port (`80`).
+- Source code must follow [Java Code Conventions](https://www.oracle.com/technetwork/java/codeconventions-150003.pdf)  
+  and the [Google Java Style Guide](https://google.github.io/styleguide/javaguide.html).
+
+## Testing Information
+
+The conversion rules file will contain no more than `1,000,000` different conversion rules,  
+and no more than `200,000` unique units of measurement.
